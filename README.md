@@ -29,4 +29,11 @@ python kasisbot.py
 
 More detailed instructions in the bot.
 
+### Troubleshooting
+
+If you are having trouble getting your file compiled try compiling them manually with:
+```
+python -m spexcript malli.txt
+```
+
 
