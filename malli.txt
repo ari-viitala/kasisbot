@@ -1,0 +1,54 @@
+# Mallispeksi
+
+%Hahmo(H) Hahmo, jonka lyhenne on H
+%Toinen(T) Toinen hahmo, jonka lyhenne on T
+
+{Aaltosulut merkitsevät kommentin, joka poistuu käännöksessä.}
+
+{#-merkit jaottelevat speksin osia. # = Speksi, ## = Näytös, ### = Kohtaus}
+## Näytöksen nimi
+
+### Kohtauksen nimi
+Kohtauksen alkuun kirjoitetaan, mitä kohtauksessa tapahtuu. Tämä näkyy kohtausluettelossa.
+
+{Nenä vasemmalle ja väli on näyttämöohje. Hahmoihin viitataan @-merkillä ja hahmon tunnuksella.}
+< Näyttämöohje, joka kertoo että @H ja @T tekevät jotain.
+
+{Repliiki alkaa nenällä ja tunnuksella. (Käytännössä <-merkin jälkeen ensimmäinen sana boldataan.)}
+<H Moi @T!
+
+<T No terveppä terve @H!
+
+<Nimetön Minullekin voi kirjottaa repliikin, vaikka en ole hahmo.
+
+### Puhelinkohtaus
+Tässä kohtauksessa tapahtuu myös asioita.
+
+< @T ja @H ovat puhelimen vieressä.
+
+{Äänitehtosteet merkitään yhdellä dollarilla}
+$ Puhelin soi
+
+<H Vastaa sinä. Se on varmasti äiti.
+
+<T En vastaa. Vastaa sinä.
+
+{Biisit merkitään kahdella dollarilla}
+$$ @H ja @T laulavat puhelimeenvastaamisbiisin.
+
+
+{Väliaika on kolme viivaa}
+---
+
+## Toinen näytös
+Toisessa näytöksessä jännitys tiivistyy.
+
+### Jännittävä kohtaus
+Kohtauksessa tapahtuu jotain jännittävää.
+
+< @H singanhtaa ulos piilopaikastaan.
+
+<H (pelottavasti) Pöö!
+
+<T Hui. 
+
