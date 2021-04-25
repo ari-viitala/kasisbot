@@ -10,7 +10,9 @@ Fyysikkospeksin käsistiimin bottikäyttöliittymä Spexcript käsikirjoituslado
 
 */historia (n)* Listaa n viimeisintä käsistä tai kaikki tallennettut käsikset.   
 
-*Spextex-tiedoston kääntäminen toimii seuraavasti:*
+*/kaanna_drive (nimi)* Kääntää käsistiimin drivessä olevan lähdekoodin käsikirjoitukseksi. Jos nimi on annettu, käsikirjoitus tallennetaan tällä nimellä. 
+
+*Oman Spextex-tiedoston kääntäminen toimii seuraavasti:*
     - Botti yrittää käänttä kaikki sillen yksityisviestillä lähetetyt tiedostot 
     - Botti yrittää kääntää jokaisen chättiin lähetetyn tiedoston, jonka caption sisältää `@kassaribot`.
     - Botti tallentaa jokaisen käännettävän tiedoston, jonka captionissa on `tallenna`.

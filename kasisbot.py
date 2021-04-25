@@ -9,6 +9,8 @@ import subprocess
 import pathlib
 import datetime
 
+import makespex
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 
@@ -150,6 +152,51 @@ def handle_compile(update, context):
     for f in os.listdir("./temp/"):
         os.remove(f"./temp/{f}")
 
+def drive_compile(update, context):
+
+    if not is_chat_member(update, context):
+        return
+
+    try:
+        text = makespex.read_manuscript()
+    except:
+        print("Virhe ladattaessa käsistä Drivestä")
+        return
+
+    save = len(context.args) > 0
+
+    if save:
+        name = context.args[0] + ".txt"
+    else:
+        name = f"drive_compile_{datetime.datetime.now().isoformat()[:19]}.txt"
+
+    with open(f"./temp/{name}", "w+") as f:
+        f.write(text)
+
+    try:
+        subprocess.run(["python", "-m" "spexcript", f"./temp/{name}"], timeout=10)
+    except:
+        update.effective_message.reply_text("Tiedoston kääntäminen ei onnistunut.")
+        for f in os.listdir("./temp/"):
+            os.remove(f"./temp/{f}")
+        return 0
+
+    try:
+        context.bot.send_document(update.effective_chat.id, document=open(f"./temp/{name.split('.')[0]}.pdf", "rb"))
+    except:
+        update.effective_message.reply_text("Tiedosto ei kääntynyt.")
+        
+    if save:
+        files = [f for f in os.listdir("./temp/")]
+        for f in files:
+            os.rename(f"./temp/{f}", f"./files/{f}")
+
+    for f in os.listdir("./temp/"):
+        os.remove(f"./temp/{f}")
+
+    return True
+
+    
 
 def compile(update, context):
     """Compiles the document in update using Spexcript."""
@@ -197,6 +244,7 @@ def main():
 
     dp.add_handler(CommandHandler("malli", model_file))
     dp.add_handler(CommandHandler("kasis", recompile))
+    dp.add_handler(CommandHandler("kaanna_drive", drive_compile))
     
     dp.add_handler(MessageHandler(Filters.document, handle_compile))
 
