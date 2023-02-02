@@ -126,14 +126,15 @@ def drive_compile(update, context):
     if save:
         name = context.args[0] + ".txt"
     else:
-        name = f"speksi_{datetime.datetime.now()}.txt"
+        name = f"speksi-{datetime.datetime.now().strftime('%Y-%m-%d')}"
 
     with open(f"./temp/{name}", "w+") as f:
         f.write(text)
 
     try:
         subprocess.run(["python", "-m" "spexcript", f"./temp/{name}"], timeout=10)
-    except:
+    except Exception as e:
+        print(e)
         update.effective_message.reply_text("Tiedoston kääntäminen ei onnistunut.")
         for f in os.listdir("./temp/"):
             os.remove(f"./temp/{f}")
@@ -142,9 +143,10 @@ def drive_compile(update, context):
     try:
         context.bot.send_document(
             update.effective_chat.id,
-            document=open(f"./temp/{name.split('.')[0]}.pdf", "rb"),
+            document=open(f"./temp/{name}.pdf", "rb"),
         )
-    except:
+    except Exception as e:
+        print(e)
         update.effective_message.reply_text("Tiedosto ei kääntynyt.")
 
     if save:
