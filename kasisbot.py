@@ -14,12 +14,8 @@ import makespex
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 
-#Change this to your bot's token given by Telegrams Botfather.
-BOT_TOKEN = ""
 
-#Change this to your chat where you want you messages to be forwarded.
-#To figure out the id, use for example the /whoami command of this bot in the chat.
-CHAT_ID = 0
+from config import TELEGRAM_BOT_TOKEN, AUTHORIZED_CHAT_ID
 
 #Sent messages are saved here to enable replying.
 sent_messages = {}
@@ -67,7 +63,7 @@ def is_chat_member(update, context):
     """Check if message comes from a member of käsistiimi"""
 
     try:
-        context.bot.get_chat(CHAT_ID).get_member(update.effective_user.id)
+        context.bot.get_chat(AUTHORIZED_CHAT_ID).get_member(update.effective_user.id)
         return True
     except:
         update.message.reply_test("Ominaisuus käytössä vain käsistiimin jäsenille.")
@@ -159,7 +155,8 @@ def drive_compile(update, context):
 
     try:
         text = makespex.read_manuscript()
-    except:
+    except Exception as e:
+        print(e)
         print("Virhe ladattaessa käsistä Drivestä")
         return
 
@@ -232,7 +229,7 @@ def compile(update, context):
 def main():
     """Main polling loop that contains all the callback handlers"""
 
-    updater = Updater(token=BOT_TOKEN)
+    updater = Updater(token=TELEGRAM_BOT_TOKEN)
 
     dp = updater.dispatcher
 

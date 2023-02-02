@@ -12,8 +12,7 @@ from google.oauth2.credentials import Credentials
 SCOPES = ['https://www.googleapis.com/auth/documents.readonly',
         'https://www.googleapis.com/auth/drive.metadata.readonly']
 
-# The ID of drive containing all documents.
-DRIVE_ID = '1gGV-wzhG3l1HYOp_Y0dz2ko9PqqFmg6t'
+from config import GOOGLE_DRIVE_ID
 
 
 # Functions taken from: https://developers.google.com/docs/api/samples/extract-text
@@ -82,7 +81,7 @@ def read_manuscript():
     # Get list of all documents in given folder.
     drive_service = build('drive', 'v3', credentials=creds)
     documents = drive_service.files().list(
-            q=f"'{DRIVE_ID}' in parents",
+            q=f"'{GOOGLE_DRIVE_ID}' in parents",
             orderBy="name",
             fields="files(id)").execute()
     document_ids = [item["id"] for item in documents.get('files', [])]
