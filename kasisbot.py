@@ -17,21 +17,22 @@ import logging
 
 from config import TELEGRAM_BOT_TOKEN, AUTHORIZED_CHAT_ID
 
-#Sent messages are saved here to enable replying.
+# Sent messages are saved here to enable replying.
 sent_messages = {}
 
 if not os.path.isdir("./files"):
     os.mkdir("./files")
-    
+
 if not os.path.isdir("./temp"):
     os.mkdir("./temp")
-    
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 
 logger = logging.getLogger(__name__)
+
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
@@ -42,15 +43,19 @@ def error(bot, update, error):
 def start(update, context):
     """Send a message when the command /start is issued."""
 
-    update.message.reply_text("""Fyysikkospeksin käsistiimin bottikäyttöliittymä Spexcript käsikirjoitusladontaohjelmistolle. Saat tarkemmat ojeet kirjoittamalla /help.""")
+    update.message.reply_text(
+        """Fyysikkospeksin käsistiimin bottikäyttöliittymä Spexcript käsikirjoitusladontaohjelmistolle. Saat tarkemmat ojeet kirjoittamalla /help."""
+    )
+
 
 def help(update, context):
     """List the commands used by the bot"""
 
     with open("help.txt") as f:
-        text = f.read() 
+        text = f.read()
 
     update.message.reply_text(text, parse_mode="Markdown")
+
 
 def whoami(update, context):
     """Displays chat's ID"""
@@ -69,10 +74,12 @@ def is_chat_member(update, context):
         update.message.reply_test("Ominaisuus käytössä vain käsistiimin jäsenille.")
         return False
 
+
 def model_file(update, context):
     """Send the model syntax as a file."""
 
     context.bot.send_document(update.effective_chat.id, document=open("malli.txt"))
+
 
 def history(update, context):
     """Show a listing of previous versions."""
@@ -87,7 +94,7 @@ def history(update, context):
     files = [f[0] for f in files]
 
     try:
-        files = files[:int(context.args[0])]
+        files = files[: int(context.args[0])]
     except:
         pass
 
@@ -100,10 +107,9 @@ def recompile(update, context):
     """Resend a saved file."""
 
     if not is_chat_member(update, context):
-        return 
+        return
 
     if len(context.args) > 0:
-
         if os.path.isfile(f"./files/{context.args[0]}"):
             file = context.args[0].split(".")[0]
         else:
@@ -120,12 +126,14 @@ def recompile(update, context):
     files = [f for f in os.listdir("./files") if file in f]
 
     for f in files:
-        context.bot.send_document(update.effective_chat.id, document=open(f"./files/{f}", "rb"))
-    
+        context.bot.send_document(
+            update.effective_chat.id, document=open(f"./files/{f}", "rb")
+        )
+
 
 def handle_compile(update, context):
     """Handles saving the temporary files if appropriate."""
-    
+
     caption = update.effective_message.caption
     caption = caption.lower() if caption else ""
 
@@ -148,8 +156,8 @@ def handle_compile(update, context):
     for f in os.listdir("./temp/"):
         os.remove(f"./temp/{f}")
 
-def drive_compile(update, context):
 
+def drive_compile(update, context):
     if not is_chat_member(update, context):
         return
 
@@ -179,10 +187,13 @@ def drive_compile(update, context):
         return 0
 
     try:
-        context.bot.send_document(update.effective_chat.id, document=open(f"./temp/{name.split('.')[0]}.pdf", "rb"))
+        context.bot.send_document(
+            update.effective_chat.id,
+            document=open(f"./temp/{name.split('.')[0]}.pdf", "rb"),
+        )
     except:
         update.effective_message.reply_text("Tiedosto ei kääntynyt.")
-        
+
     if save:
         files = [f for f in os.listdir("./temp/")]
         for f in files:
@@ -193,24 +204,32 @@ def drive_compile(update, context):
 
     return True
 
-    
 
 def compile(update, context):
     """Compiles the document in update using Spexcript."""
 
     try:
         name = update.effective_message.document.file_name
-        
+
         if name == "malli.txt":
-            pass 
+            pass
         else:
-            name = name.split(".")[0] + "_" + datetime.datetime.now().isoformat()[:10] + ".txt"
-        
-        update.effective_message.document.get_file().download(custom_path=f"./temp/{name}")
+            name = (
+                name.split(".")[0]
+                + "_"
+                + datetime.datetime.now().isoformat()[:10]
+                + ".txt"
+            )
+
+        update.effective_message.document.get_file().download(
+            custom_path=f"./temp/{name}"
+        )
     except:
-        update.effective_message.reply_text("Jotain meni pieleen tiedoston lataamisessa.")
+        update.effective_message.reply_text(
+            "Jotain meni pieleen tiedoston lataamisessa."
+        )
         return False
-    
+
     try:
         subprocess.run(["python", "-m" "spexcript", f"./temp/{name}"], timeout=10)
     except:
@@ -218,7 +237,10 @@ def compile(update, context):
         return False
 
     try:
-        context.bot.send_document(update.effective_chat.id, document=open(f"./temp/{name.split('.')[0]}.pdf", "rb"))
+        context.bot.send_document(
+            update.effective_chat.id,
+            document=open(f"./temp/{name.split('.')[0]}.pdf", "rb"),
+        )
     except:
         update.effective_message.reply_text("Tiedosto ei kääntynyt.")
         return False
@@ -233,7 +255,7 @@ def main():
 
     dp = updater.dispatcher
 
-    #Add handlers to the dispatchers. This defines what the bot does when it receives messages.
+    # Add handlers to the dispatchers. This defines what the bot does when it receives messages.
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("whoami", whoami))
@@ -242,7 +264,7 @@ def main():
     dp.add_handler(CommandHandler("malli", model_file))
     dp.add_handler(CommandHandler("kasis", recompile))
     dp.add_handler(CommandHandler("kaanna_drive", drive_compile))
-    
+
     dp.add_handler(MessageHandler(Filters.document, handle_compile))
 
     dp.add_error_handler(error)
@@ -251,5 +273,6 @@ def main():
 
     updater.idle()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
