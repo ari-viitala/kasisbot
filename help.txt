@@ -6,17 +6,10 @@ Fyysikkospeksin käsistiimin bottikäyttöliittymä Spexcript käsikirjoituslado
 
 */malli* Mallitiedosto Spexcriptin syntaksista
 
-*/kasis (nimi)* Viimeisin tai tietty tallennettu käsikirjoitus. Nimellä haettu käsis palauttaa myös lähdekoodin.
-
-*/historia (n)* Listaa n viimeisintä käsistä tai kaikki tallennettut käsikset.   
-
-*/kaanna_drive (nimi)* Kääntää käsistiimin drivessä olevan lähdekoodin käsikirjoitukseksi. Jos nimi on annettu, käsikirjoitus tallennetaan tällä nimellä. 
+*/pull* Lukee lähdekoodin Google Drivestä ja kääntää siitä speksin
 
 *Oman Spextex-tiedoston kääntäminen toimii seuraavasti:*
-    - Botti yrittää käänttä kaikki sillen yksityisviestillä lähetetyt tiedostot 
+    - Botti yrittää kääntää kaikki sillen yksityisviestillä lähetetyt tiedostot 
     - Botti yrittää kääntää jokaisen chättiin lähetetyn tiedoston, jonka caption sisältää `@kassaribot`.
-    - Botti tallentaa jokaisen käännettävän tiedoston, jonka captionissa on `tallenna`.
 
-*/kasis, /historia ja tallenna toiminnalisuudet ovat toistaiseksi ainoastaan kässäritiimin käytössä.*
-
-Jos ei käänny, älä huoli, vika ei todennäköisesti ole sinussa. Ota yhteyttä @Stippos ja laitetaan kääntymään.
+Lisätietoa https://github.com/summis/kasisbot/blob/main/README.md

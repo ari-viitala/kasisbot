@@ -81,56 +81,6 @@ def model_file(update, context):
     context.bot.send_document(update.effective_chat.id, document=open("malli.txt"))
 
 
-def history(update, context):
-    """Show a listing of previous versions."""
-
-    if not is_chat_member(update, context):
-        return
-
-    files = [f for f in os.listdir("./files") if ".pdf" in f]
-    files = [(f, pathlib.Path(f"./files/{f}").stat().st_mtime) for f in files]
-    files = sorted(files, key=lambda x: -x[1])
-
-    files = [f[0] for f in files]
-
-    try:
-        files = files[: int(context.args[0])]
-    except:
-        pass
-
-    text = "*Viimeiset käsikset:*\n```\n" + "\n".join(files) + "```"
-
-    update.effective_message.reply_text(text, parse_mode="Markdown")
-
-
-def recompile(update, context):
-    """Resend a saved file."""
-
-    if not is_chat_member(update, context):
-        return
-
-    if len(context.args) > 0:
-        if os.path.isfile(f"./files/{context.args[0]}"):
-            file = context.args[0].split(".")[0]
-        else:
-            update.message.reply_text("Tiedostoa ei löydy")
-            return
-
-    else:
-        files = [f for f in os.listdir("./files") if ".pdf" in f]
-        files = [(f, pathlib.Path(f"./files/{f}").stat().st_mtime) for f in files]
-        files = sorted(files, key=lambda x: -x[1])
-
-        file = files[0][0]
-
-    files = [f for f in os.listdir("./files") if file in f]
-
-    for f in files:
-        context.bot.send_document(
-            update.effective_chat.id, document=open(f"./files/{f}", "rb")
-        )
-
-
 def handle_compile(update, context):
     """Handles saving the temporary files if appropriate."""
 
@@ -164,6 +114,9 @@ def drive_compile(update, context):
     try:
         text = makespex.read_manuscript()
     except Exception as e:
+        update.effective_message.reply_text(
+            "Tiedoston lataaminen Drivestä ei onnistunut. Olen pahoillani :("
+        )
         print(e)
         print("Virhe ladattaessa käsistä Drivestä")
         return
@@ -173,7 +126,7 @@ def drive_compile(update, context):
     if save:
         name = context.args[0] + ".txt"
     else:
-        name = f"drive_compile_{datetime.datetime.now().isoformat()[:19]}.txt"
+        name = f"speksi_{datetime.datetime.now()}.txt"
 
     with open(f"./temp/{name}", "w+") as f:
         f.write(text)
@@ -259,11 +212,8 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("whoami", whoami))
-    dp.add_handler(CommandHandler("historia", history))
-
     dp.add_handler(CommandHandler("malli", model_file))
-    dp.add_handler(CommandHandler("kasis", recompile))
-    dp.add_handler(CommandHandler("kaanna_drive", drive_compile))
+    dp.add_handler(CommandHandler("pull", drive_compile))
 
     dp.add_handler(MessageHandler(Filters.document, handle_compile))
 
