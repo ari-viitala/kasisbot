@@ -71,7 +71,7 @@ def is_chat_member(update, context):
         context.bot.get_chat(AUTHORIZED_CHAT_ID).get_member(update.effective_user.id)
         return True
     except:
-        update.message.reply_test("Ominaisuus käytössä vain käsistiimin jäsenille.")
+        update.message.reply_text("Ominaisuus käytössä vain käsistiimin jäsenille.")
         return False
 
 
