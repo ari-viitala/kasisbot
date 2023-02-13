@@ -11,6 +11,7 @@ import datetime
 
 import makespex
 
+from telegram import TelegramError
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 
@@ -68,7 +69,7 @@ def is_chat_member(update, context):
     """Check if message comes from a member of käsistiimi"""
 
     try:
-        context.bot.get_chat(AUTHORIZED_CHAT_ID).get_member(update.effective_user.id)
+        context.bot.get_chat_member(AUTHORIZED_CHAT_ID, update.effective_user.id)
         return True
     except:
         update.message.reply_text("Ominaisuus käytössä vain käsistiimin jäsenille.")
@@ -107,57 +108,29 @@ def handle_compile(update, context):
         os.remove(f"./temp/{f}")
 
 
-def drive_compile(update, context):
-    if not is_chat_member(update, context):
-        return
+def _get_name():
+    return f"speksi-{datetime.datetime.now().strftime('%Y-%m-%d')}"
 
-    try:
-        text = makespex.read_manuscript()
-    except Exception as e:
-        update.effective_message.reply_text(
-            "Tiedoston lataaminen Drivestä ei onnistunut. Olen pahoillani :("
-        )
-        print(e)
-        print("Virhe ladattaessa käsistä Drivestä")
-        return
 
-    save = len(context.args) > 0
-
-    if save:
-        name = context.args[0] + ".txt"
-    else:
-        name = f"speksi-{datetime.datetime.now().strftime('%Y-%m-%d')}"
-
-    with open(f"./temp/{name}", "w+") as f:
-        f.write(text)
-
-    try:
-        subprocess.run(["python", "-m" "spexcript", f"./temp/{name}"], timeout=10)
-    except Exception as e:
-        print(e)
-        update.effective_message.reply_text("Tiedoston kääntäminen ei onnistunut.")
-        for f in os.listdir("./temp/"):
-            os.remove(f"./temp/{f}")
-        return 0
-
-    try:
-        context.bot.send_document(
-            update.effective_chat.id,
-            document=open(f"./temp/{name}.pdf", "rb"),
-        )
-    except Exception as e:
-        print(e)
-        update.effective_message.reply_text("Tiedosto ei kääntynyt.")
-
-    if save:
-        files = [f for f in os.listdir("./temp/")]
-        for f in files:
-            os.rename(f"./temp/{f}", f"./files/{f}")
-
+def _clean_temp_dir():
     for f in os.listdir("./temp/"):
         os.remove(f"./temp/{f}")
 
-    return True
+def drive_compile(update, context):
+    if is_chat_member(update, context):
+        try:
+            text = makespex.read_manuscript()
+            name = _get_name()
+            with open(f"./temp/{name}", "w+") as f:
+                f.write(text)
+            subprocess.run(["python", "-m" "spexcript", f"./temp/{name}"], timeout=10)
+            context.bot.send_document(
+                update.effective_chat.id,
+                document=open(f"./temp/{name}.pdf", "rb"),
+            )
+            _clean_temp_dir()
+        except Exception as e:
+            update.effective_message.reply_text(f"Tiedoston kääntäminen ei onnistunut. Virhe: {str(e)}")
 
 
 def compile(update, context):
